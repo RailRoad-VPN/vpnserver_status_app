@@ -1,4 +1,5 @@
 import json
+import os
 import subprocess
 from pprint import pprint
 
@@ -10,31 +11,43 @@ def random_with_n_digits(n):
     return randint(range_start, range_end)
 
 
-# print(f"call strongswan statusall")
 result = str(subprocess.check_output(["/usr/sbin/strongswan", "statusall"]))
 result = str(result).split("\\n")
 
+# f = open("/Users/dikkini/Developing/workspaces/my/DFN/vpnserver_status_app/ikev2.log", 'r')
+# result = f.readlines()
+# f.close()
+
 found_user = False
 next_ip_adress = False
+was_rekey = False
+
+email = None
 
 data = {
-    'server': {}
+    'server': {
+        'uuid': os.environ['RROADVPN_SERVER_UUID'],
+        'type': 'ikev2'
+    }
 }
-users = []
+
+users = {}
 user = {}
 for line in result:
     if next_ip_adress:
         next_ip_adress = False
         server_ip_addr = line
-        data['server']['ip_addr'] = server_ip_addr.split(" ")[-1]
+        data['server']['ip_addr'] = server_ip_addr.split("\n")[0].split(" ")[-1]
+        continue
 
     if "Listening IP addresses" in line:
         next_ip_adress = True
+        continue
 
     if "Security Associations" in line:
         users_count = line.split("Associations")[-1].split(",")[0].split("(")[1].split(' ')[0]
         data['server']['users_count'] = users_count
-        # print(f"Users Connected to server: {users_count}")
+        continue
 
     if "ESTABLISHED" in line and not found_user:
         found_user = True
@@ -42,24 +55,28 @@ for line in result:
         info = line.split("ESTABLISHED")[1].split(",")
         time_connected = info[0]
         user['time_connected'] = time_connected
-        # print(f"Time Connected: {time_connected}")
         ip_device = info[1].split("...")[-1].split("[")[0]
         email = info[1].split("...")[-1].split("[")[1].split("]")[0]
         user['ip_device'] = ip_device
         user['email'] = email
-        # print(f"User IP address: {ip_device}")
-        # print(f"User Email: {email}")
+        continue
 
     if "rekeying in" in line:
-        bytes_i = line.split("bytes_i")[0].split(", ")[-1]
-        # print(f"bytes_i: {bytes_i}")
+        bytes_i = line.split("bytes_i")[0].split(", ")[-1].split(' ')[0]
         user['bytes_i'] = bytes_i
-        bytes_o = line.split("bytes_o")[0].split(", ")[-1]
-        # print(f"bytes_o: {bytes_o}")
+        bytes_o = line.split("bytes_o")[0].split(", ")[-1].split(' ')[0]
         user['bytes_o'] = bytes_o
         found_user = False
-        users.append(user)
+        was_rekey = True
+        continue
+
+    if was_rekey:
+        was_rekey = False
+        virtual_ip = line.split(" === ")[-1].split("/32")[0]
+        user['virtual_ip'] = virtual_ip
+        users[email] = user
         user = {}
+        continue
 
 data['users'] = users
 
