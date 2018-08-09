@@ -1,6 +1,7 @@
 import json
 import os
 from pprint import pprint
+import requests
 
 
 def random_with_n_digits(n):
@@ -9,7 +10,13 @@ def random_with_n_digits(n):
     from random import randint
     return randint(range_start, range_end)
 
+api_host = "http://internal.novicorp.com:61885"
+resource_uri = "api/v1/vpnc/server"
 
+headers = {
+    'Content-Type': 'application/json',
+    'Accept': 'text/plain'
+}
 openvpn_status_file = "/etc/openvpn/openvpn-status.log"
 
 f = open(openvpn_status_file, 'r')
@@ -81,3 +88,13 @@ data['users'] = users
 pprint(data)
 
 users_json = json.dumps(data)
+
+url = f"{api_host}/{resource_uri}/{data['server']['uuid']}/connections"
+
+try:
+    req = requests.post(url=url, json=users_json, headers=headers)
+except requests.exceptions.ConnectionError as e:
+    print(f"API error: {e}")
+    exit(100)
+
+exit(0)

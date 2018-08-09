@@ -3,6 +3,8 @@ import os
 import subprocess
 from pprint import pprint
 
+import requests
+
 
 def random_with_n_digits(n):
     range_start = 10 ** (n - 1)
@@ -10,6 +12,12 @@ def random_with_n_digits(n):
     from random import randint
     return randint(range_start, range_end)
 
+api_host = "http://internal.novicorp.com:61885"
+resource_uri = "api/v1/vpnc/server"
+headers = {
+    'Content-Type': 'application/json',
+    'Accept': 'text/plain'
+}
 
 result = str(subprocess.check_output(["/usr/sbin/strongswan", "statusall"]))
 result = str(result).split("\\n")
@@ -83,3 +91,13 @@ data['users'] = users
 pprint(data)
 
 users_json = json.dumps(data)
+
+url = f"{api_host}/{resource_uri}/{data['server']['uuid']}/connections"
+
+try:
+    req = requests.post(url=url, json=users_json, headers=headers)
+except requests.exceptions.ConnectionError as e:
+    print(f"API error: {e}")
+    exit(100)
+
+exit(0)

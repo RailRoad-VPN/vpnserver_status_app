@@ -1,0 +1,10 @@
+certifi==2018.4.16
+chardet==3.0.4
+humanize==0.5.1
+idna==2.7
+netaddr==0.7.19
+openvpn-status==0.2.0
+requests==2.19.1
+schedule==0.5.0
+six==1.11.0
+urllib3==1.23
