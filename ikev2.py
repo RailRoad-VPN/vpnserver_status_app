@@ -32,6 +32,25 @@ was_rekey = False
 
 email = None
 
+# {
+# 	'server': {
+# 		'ip_addr': '194.87.235.49',
+# 		'type': 'ikev2',
+# 		'users_count': '1',
+# 		'uuid': '123'
+# 	},
+# 	'users': {
+# 		'user1@giftshaker.com': {
+# 			'bytes_i': '180731',
+# 			'bytes_o': '4756099',
+# 			'email': 'user1@giftshaker.com',
+# 			'device_ip': '213.87.150.213',
+# 			'time_connected': ' 32 minutes ago',
+# 			'virtual_ip': '10.10.2.1'
+# 		}
+# 	}
+# }
+
 data = {
     'server': {
         'uuid': os.environ['RROADVPN_SERVER_UUID'],

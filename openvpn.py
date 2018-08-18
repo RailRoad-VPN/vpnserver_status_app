@@ -52,32 +52,12 @@ users_count = 0
 # 			'bytes_o': '28721319995',
 # 			'connected_since': 'Sat Aug  4 18:49:47 2018',
 # 			'email': 'test_api',
-# 			'ip_device': '109.252.58.250',
-# 			'last_ref': 'Wed Aug  8 16:42:02 2018\n',
+# 			'device_ip': '109.252.58.250',
 # 			'virtual_ip': '10.8.0.5'
 # 		}
 # 	}
 # }
-#
-# IKEv2
-# {
-# 	'server': {
-# 		'ip_addr': '194.87.235.49',
-# 		'type': 'ikev2',
-# 		'users_count': '1',
-# 		'uuid': '123'
-# 	},
-# 	'users': {
-# 		'user1@giftshaker.com': {
-# 			'bytes_i': '180731',
-# 			'bytes_o': '4756099',
-# 			'email': 'user1@giftshaker.com',
-# 			'ip_device': '213.87.150.213',
-# 			'time_connected': ' 32 minutes ago',
-# 			'virtual_ip': '10.10.2.1'
-# 		}
-# 	}
-# }
+
 
 data = {
     'server': {
@@ -137,6 +117,10 @@ pprint(data)
 users_json = json.dumps(data)
 
 url = f"{api_host}/{resource_uri}/{data['server']['uuid']}/connections"
+
+f = open('/tmp/test.output', 'wt', encoding='utf-8')
+f.write(users_json)
+f.close()
 
 try:
     req = requests.post(url=url, json=users_json, headers=headers)
