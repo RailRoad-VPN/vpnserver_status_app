@@ -61,11 +61,9 @@ for line in result:
         found_user = True
         user = {}
         info = line.split("ESTABLISHED")[1].split(",")
-        time_connected = info[0]
-        user['time_connected'] = time_connected
-        ip_device = info[1].split("...")[-1].split("[")[0]
+        device_ip = info[1].split("...")[-1].split("[")[0]
         email = info[1].split("...")[-1].split("[")[1].split("]")[0]
-        user['ip_device'] = ip_device
+        user['device_ip'] = device_ip
         user['email'] = email
         continue
 

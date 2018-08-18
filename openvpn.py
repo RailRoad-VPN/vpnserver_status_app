@@ -11,7 +11,7 @@ def random_with_n_digits(n):
     return randint(range_start, range_end)
 
 api_host = "http://internal.novicorp.com:61885"
-resource_uri = "api/v1/vpnc/server"
+resource_uri = "api/v1/vpns/servers"
 
 headers = {
     'Content-Type': 'application/json',
@@ -29,6 +29,55 @@ found_user = False
 
 email = None
 users_count = 0
+
+# OpenVPN
+# {
+# 	'server': {
+# 		'type': 'openvpn',
+# 		'users_count': 2,
+# 		'uuid': '456'
+# 	},
+# 	'users': {
+# 		'mbp': {
+# 			'bytes_i': '1164331',
+# 			'bytes_o': '13418401',
+# 			'connected_since': 'Wed Aug  8 16:27:35 2018',
+# 			'email': 'mbp',
+# 			'ip_device': '185.89.9.144',
+# 			'last_ref': 'Wed Aug  8 16:42:01 2018\n',
+# 			'virtual_ip': '10.8.0.2'
+# 		},
+# 		'test_api': {
+# 			'bytes_i': '2571431944',
+# 			'bytes_o': '28721319995',
+# 			'connected_since': 'Sat Aug  4 18:49:47 2018',
+# 			'email': 'test_api',
+# 			'ip_device': '109.252.58.250',
+# 			'last_ref': 'Wed Aug  8 16:42:02 2018\n',
+# 			'virtual_ip': '10.8.0.5'
+# 		}
+# 	}
+# }
+#
+# IKEv2
+# {
+# 	'server': {
+# 		'ip_addr': '194.87.235.49',
+# 		'type': 'ikev2',
+# 		'users_count': '1',
+# 		'uuid': '123'
+# 	},
+# 	'users': {
+# 		'user1@giftshaker.com': {
+# 			'bytes_i': '180731',
+# 			'bytes_o': '4756099',
+# 			'email': 'user1@giftshaker.com',
+# 			'ip_device': '213.87.150.213',
+# 			'time_connected': ' 32 minutes ago',
+# 			'virtual_ip': '10.10.2.1'
+# 		}
+# 	}
+# }
 
 data = {
     'server': {
@@ -58,8 +107,8 @@ for line in res:
         user_str_splitted = user_str.split(',')
         email = user_str_splitted[0]
         user['email'] = email
-        ip_device = user_str_splitted[1].split(":")[0]
-        user['ip_device'] = ip_device
+        device_ip = user_str_splitted[1].split(":")[0]
+        user['device_ip'] = device_ip
         bytes_i = user_str_splitted[2]
         user['bytes_i'] = bytes_i
         bytes_o = user_str_splitted[3]
@@ -78,9 +127,7 @@ for line in res:
         user_route_table_str_splitted = user_route_table_str.split(',')
         virtual_ip = user_route_table_str_splitted[0]
         email = user_route_table_str_splitted[1]
-        last_ref = user_route_table_str_splitted[3]
         users[email]['virtual_ip'] = virtual_ip
-        users[email]['last_ref'] = last_ref
 
 data['server']['users_count'] = users_count
 data['users'] = users
