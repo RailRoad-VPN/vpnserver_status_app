@@ -12,8 +12,9 @@ def random_with_n_digits(n):
     from random import randint
     return randint(range_start, range_end)
 
+
 api_host = "http://internal.novicorp.com:61885"
-resource_uri = "api/v1/vpnc/server"
+resource_uri = "api/v1/vpnc/servers"
 headers = {
     'Content-Type': 'application/json',
     'Accept': 'text/plain'
@@ -21,10 +22,6 @@ headers = {
 
 result = str(subprocess.check_output(["/usr/sbin/strongswan", "statusall"]))
 result = str(result).split("\\n")
-
-# f = open("/Users/dikkini/Developing/workspaces/my/DFN/vpnserver_status_app/ikev2.log", 'r')
-# result = f.readlines()
-# f.close()
 
 found_user = False
 next_ip_adress = False
@@ -110,6 +107,10 @@ pprint(data)
 users_json = json.dumps(data)
 
 url = f"{api_host}/{resource_uri}/{data['server']['uuid']}/connections"
+
+f = open('/tmp/ikev2.output', 'wt', encoding='utf-8')
+f.write(users_json)
+f.close()
 
 try:
     req = requests.post(url=url, json=users_json, headers=headers)

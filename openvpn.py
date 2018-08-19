@@ -1,6 +1,7 @@
 import json
 import os
 from pprint import pprint
+
 import requests
 
 
@@ -10,9 +11,9 @@ def random_with_n_digits(n):
     from random import randint
     return randint(range_start, range_end)
 
-api_host = "http://internal.novicorp.com:61885"
-resource_uri = "api/v1/vpns/servers"
 
+api_host = "http://internal.novicorp.com:61885"
+resource_uri = "api/v1/vpnc/servers"
 headers = {
     'Content-Type': 'application/json',
     'Accept': 'text/plain'
@@ -118,7 +119,7 @@ users_json = json.dumps(data)
 
 url = f"{api_host}/{resource_uri}/{data['server']['uuid']}/connections"
 
-f = open('/tmp/test.output', 'wt', encoding='utf-8')
+f = open('/tmp/openvpn.output', 'wt', encoding='utf-8')
 f.write(users_json)
 f.close()
 
