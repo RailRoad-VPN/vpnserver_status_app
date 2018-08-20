@@ -14,7 +14,7 @@ def random_with_n_digits(n):
 
 
 api_host = "http://internal.novicorp.com:61885"
-resource_uri = "api/v1/vpnc/servers"
+resource_uri = "api/v1/vpns/servers"
 headers = {
     'Content-Type': 'application/json',
     'Accept': 'text/plain'
@@ -104,16 +104,14 @@ data['users'] = users
 
 pprint(data)
 
-users_json = json.dumps(data)
-
 url = f"{api_host}/{resource_uri}/{data['server']['uuid']}/connections"
 
 f = open('/tmp/ikev2.output', 'wt', encoding='utf-8')
-f.write(users_json)
+f.write(json.dumps(data))
 f.close()
 
 try:
-    req = requests.post(url=url, json=users_json, headers=headers)
+    req = requests.post(url=url, json=data, headers=headers)
 except requests.exceptions.ConnectionError as e:
     print(f"API error: {e}")
     exit(100)
