@@ -1,18 +1,45 @@
 import json
 import os
+import uuid
 from pprint import pprint
 
 import requests
 
-
-def random_with_n_digits(n):
-    range_start = 10 ** (n - 1)
-    range_end = (10 ** n) - 1
-    from random import randint
-    return randint(range_start, range_end)
+from utils import get_unixtime, random_x
 
 
-api_host = "http://internal.novicorp.com:61885"
+def gen_sec_token() -> str:
+    # print('---------------- gen token')
+    token = ""
+    ruuid = str(uuid.uuid4())
+    ruuid = ruuid.replace("-", "")
+    ruuid_len = len(ruuid)
+    r4 = str(random_x(1, ruuid_len))
+    token += ruuid
+    unixtime = get_unixtime()
+    # print("Unix time:" + str(unixtime))
+    # print("Unix time len:" + str(len(str(unixtime))))
+    unixtime_divided = int(unixtime) / int(r4)
+    # print("Unix time divided:" + str(unixtime_divided))
+    unixtime_divided_rounded = "%.10f" % (unixtime_divided)
+    # print("Unix time divided rounded:" + str(unixtime_divided_rounded))
+    unixtime_divided_len = str(len(str(unixtime_divided_rounded)))
+    if len(unixtime_divided_len) == 1:
+        unixtime_divided_len = "0" + str(unixtime_divided_len)
+    # print("Unix time rounded len:" + unixtime_divided_len )
+    left_token = token[:int(r4)]
+    center_token = str(unixtime_divided_rounded)
+    right_token = token[int(r4):]
+    token = left_token + center_token + right_token
+    if len(r4) == 1:
+        r4 = "0" + str(r4)
+    token = str(r4) + str(unixtime_divided_len) + token
+    # print("Random number:" + str(r4))
+    # print("Token: " + str(token))
+    return token
+
+
+api_host = "http://rroadvpn.net:61885"
 resource_uri = "api/v1/vpns/servers"
 headers = {
     'Content-Type': 'application/json',
@@ -120,6 +147,8 @@ url = f"{api_host}/{resource_uri}/{data['server']['uuid']}/connections"
 f = open('/tmp/openvpn.output', 'wt', encoding='utf-8')
 f.write(json.dumps(data))
 f.close()
+
+headers['X-Auth-Token'] = gen_sec_token()
 
 try:
     req = requests.post(url=url, json=data, headers=headers)
